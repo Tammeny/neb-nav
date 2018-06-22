@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name=viewport content="width=device-width,initial-scale=1">
+  <title>星云免费域名</title>
+  <meta name="description" content="星云免费域名">
+  <link rel="stylesheet" href="https://cdn.bootcss.com/material-design-icons/3.0.1/iconfont/material-icons.css">
+</head>
+
+<body>
+  <div id="app">
+    <router-view></router-view>
+    <card-snackbar></card-snackbar>
+  </div>
+  <script src="../lib/nebulas.js"></script>
+  <script src="../lib/nebPay.js"></script>
+  <script>
+    var nebulas = require("nebulas"),
+      NebPay = require("nebpay"),
+      HttpRequest = nebulas.HttpRequest,
+      Neb = nebulas.Neb,
+      Account = nebulas.Account,
+      Transaction = nebulas.Transaction,
+      Unit = nebulas.Unit,
+      Utils = nebulas.Utils;
+
+    var config = {
+      // name: "mainnet",
+      // contractAddress: "n1oUREmVX7ehZLqd7oMB2Xq3seUWYdEkikt",
+      // address: "",
+      // nebState: {},
+      // admin: "n1G2qdFLkiT77AwjvAZQHg5Evh3o3kFyiUP",
+      // isAdmin: false,
+      // host: "https://mainnet.nebulas.io",
+      // payApi: "https://pay.nebulas.io/api/mainnet/pay"
+      name: "testnet",
+      contractAddress: "n236YqTpfxTtR2FHmScXT8Z5BxPmVJsPr23",
+      address: "",
+      nebState: {},
+      admin: "n1G2qdFLkiT77AwjvAZQHg5Evh3o3kFyiUP",
+      isAdmin: false,
+      host: "https://testnet.nebulas.io",
+      payApi: "https://pay.nebulas.io/api/pay"
+    };
+
+    var neb = new Neb();
+    neb.setRequest(new HttpRequest(config.host));
+
+    var nebApi = neb.api;
+    var nebPay = new NebPay();
+  </script>
+  <script>
+    var _hmt = _hmt || [];
+    (function () {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?656b340bb24f21090987e758ab127571";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+</body>
+
+</html>
