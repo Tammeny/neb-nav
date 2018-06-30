@@ -1,14 +1,26 @@
 <template>
-    <mu-dialog scrollable ref="dialog" title="发布名片" width="600" max-width="80%" :esc-press-close="false" :overlay-close="false" :open.sync="openAlert">
-        <mu-text-field label="姓名" v-model="form.name"></mu-text-field>
-        <mu-text-field label="电话" v-model="form.phone"></mu-text-field>
+    <mu-dialog scrollable ref="dialog" title="发布站点" width="600" max-width="80%" :esc-press-close="false" :overlay-close="false" :open.sync="openAlert">
+        <mu-text-field label="站点名" v-model="form.name"></mu-text-field>
+        <mu-text-field label="手机" v-model="form.phone"></mu-text-field>
         <mu-text-field label="邮箱" v-model="form.email"></mu-text-field>
-        <mu-text-field label="公司" v-model="form.company"></mu-text-field>
-        <mu-text-field label="职称" v-model="form.job"></mu-text-field>
-        <mu-select label="行业" v-model="form.type">
+         <mu-text-field label="图标" v-model="form.icon"></mu-text-field>
+        <div class="select-control-group">
+            <mu-flex>
+                <mu-radio v-model="form.subDomain" :value="false" label="用自己的域名"></mu-radio>
+                <mu-radio v-model="form.subDomain" :value="true" label="使用nas.link二级域名"></mu-radio>
+            </mu-flex>
+            <mu-flex>
+                <mu-text-field label="" v-model="form.domain"></mu-text-field><span v-show="form.subDomain">.nas.link</span>
+            </mu-flex>
+            <mu-flex>
+                <mu-text-field label="服务器IP" v-model="form.ip" v-show="form.subDomain"></mu-text-field>
+            </mu-flex>
+        </div>
+    
+        <mu-select label="分类" v-model="form.type">
             <mu-option v-for="(item,index) in typeList" :key="index" :label="item.name" :value="item.cname"></mu-option>
         </mu-select>
-        <mu-text-field label="介绍" v-model="form.introduce" placeholder="可以描述一下主营业务" multi-line :rows="3" :rows-max="6" full-width></mu-text-field>
+        <mu-text-field label="介绍" v-model="form.introduce" placeholder="请认真填写DAPP介绍" multi-line :rows="3" :rows-max="6" full-width></mu-text-field>
         <mu-button slot="actions" flat @click="closeAlertDialog">取消</mu-button>
         <mu-button slot="actions" color="primary" @click="addCard(form)">发布</mu-button>
     </mu-dialog>
@@ -19,27 +31,29 @@
         name: "card-dialog",
         data() {
             return {
-                form: {},
+                form: {
+                    subDomain: true
+                },
                 typeList: [],
                 openAlert: false
             }
         },
-        created (){
+        created() {
             this.fetchAllType();
         },
         watch: {
-            typeList: function(val){
+            typeList: function(val) {
                 this.bus.$emit("typeList", val);
             }
         },
-        mounted () {
+        mounted() {
             var _this = this;
-            _this.bus.$on('openAlertDialog', function (bool) {
+            _this.bus.$on('openAlertDialog', function(bool) {
                 _this.openAlert = bool;
             });
         },
         methods: {
-            //获取所有行业
+            //获取所有分类
             fetchAllType: function() {
                 var _this = this;
                 nebApi
@@ -55,15 +69,15 @@
                             function: "allType"
                         }
                     })
-                    .then(function (res) {
+                    .then(function(res) {
                         console.info(res);
                         if (!res) {
                             return;
                         }
-                        if (res.result && res.result!=="null") {
+                        if (res.result && res.result !== "null") {
                             var result = JSON.parse(res.result);
                             _this.typeList = result.types;
-                        }else{
+                        } else {
                             _this.bus.$emit('openSnackbar', {
                                 color: 'error',
                                 message: res.execute_err,
@@ -73,10 +87,10 @@
                             });
                         }
                         _this.isLoading = false;
-                    }).catch(function(err){
+                    }).catch(function(err) {
                         _this.bus.$emit('openSnackbar', {
                             color: 'error',
-                            message: "星云主网发生错误："+err+". 请刷新重试",
+                            message: "星云主网发生错误：" + err + ". 请刷新重试",
                             open: true,
                             timeout: 3000,
                             position: 'top-end'
@@ -89,8 +103,9 @@
                     name: form.name,
                     phone: form.phone,
                     email: form.email,
-                    company: form.company,
-                    job: form.job,
+                    ip: form.ip,
+                    domain: form.subDomain ? form.domain+".nas.link":form.domain,
+                    icon: form.icon,
                     type: form.type,
                     introduce: form.introduce,
                 }];
@@ -150,7 +165,7 @@
                                 });
                                 clearInterval(timer);
                                 location.reload();
-                            }else if (result.status === 0){
+                            } else if (result.status === 0) {
                                 clearInterval(timer);
                                 _this.bus.$emit('openSnackbar', {
                                     color: 'error',

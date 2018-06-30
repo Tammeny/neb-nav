@@ -13,6 +13,13 @@
                             <mu-icon value="search"></mu-icon>
                         </mu-button>
                         <mu-button 
+                            class="review-card" 
+                            :title="item.isReview ? '已审核': '待审核'" 
+                            icon 
+                            :color="item.isReview? 'primary': 'warning'">
+                            <mu-icon value="done"></mu-icon>
+                        </mu-button>
+                        <mu-button 
                             class="delete-card" 
                             :title="item.isRemove ? '已删除': '删除'" 
                             icon 
@@ -249,9 +256,14 @@
         top: 10px;
         right: 5px;
     }
-    .my .show-card{
+    .my .review-card{
         position: absolute;
         top: 10px;
         right: 40px;
+    }
+    .my .show-card{
+        position: absolute;
+        top: 10px;
+        right: 75px;
     }
 </style>

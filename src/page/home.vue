@@ -11,7 +11,7 @@
             <mu-row gutter>
                 <mu-col sm="6" md="6" lg="6" xl="3" v-for="(item, index) in cardList" :key="index">
                     <mu-card @click="showDetail(true, item)">
-                        <mu-card-title :title="item.name" :sub-title="item.phone"></mu-card-title>
+                        <mu-card-title :title="item.name"></mu-card-title>
                         <mu-card-text>
                             {{item.introduce}}
                         </mu-card-text>
@@ -67,10 +67,8 @@
         methods: {
             //域名详情
             showDetail(open, detail) {
-                this.bus.$emit("openDetailDialog", {
-                    open: open,
-                    detail: detail
-                });
+                console.info(open, detail);
+                location.href = detail.domain;
             },
             //选择行业
             selectType(type, index) {

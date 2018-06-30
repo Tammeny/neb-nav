@@ -4,19 +4,19 @@
         <mu-appbar>
             <mu-menu>
                 <router-link to="/">
-                    星云域名
+                    星云导航
                 </router-link>
             </mu-menu>
             <mu-menu slot="right">
                 <mu-button flat @click="openAlertDialog">
                     <mu-icon left value="send" color="primary"></mu-icon>
-                    免费申请</mu-button>
+                    免费提交</mu-button>
                 <mu-button flat @click="openTypeDialog" v-if="$route.name === 'admin'">
                     <mu-icon left value="clear_all"></mu-icon>
                     添加分类</mu-button>
                 <mu-button flat to="/my" tag="button" :class="{hover: $route.name === 'my'}">
                     <mu-icon left value="person"></mu-icon>
-                    我的域名</mu-button>
+                    我的站点</mu-button>
                 <mu-button v-if="isAdmin" flat to="/admin" tag="button" :class="{hover: $route.name === 'admin'}">
                     <mu-icon left value="settings"></mu-icon>
                     管理</mu-button>
@@ -81,9 +81,6 @@
 </script>
 
 <style>
-    .mu-appbar {
-        border-top: 5px solid #81d8d0;
-    }
     .header, .header a{
         color: #000;
     }

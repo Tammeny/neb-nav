@@ -4,18 +4,6 @@ import MuseUI from "muse-ui";
 import "muse-ui/dist/muse-ui.css";
 import theme from "muse-ui/lib/theme";
 
-theme.add(
-    "tiffany",
-    {
-        primary: "#81d8d0",
-        secondary: "#ff4081",
-        success: "#4caf50",
-        warning: "#ffeb3b"
-    },
-    "light"
-);
-theme.use("tiffany");
-
 Vue.use(MuseUI);
 
 import CardSnackbar from "./components/snackbar.vue";

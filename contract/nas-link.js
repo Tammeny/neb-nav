@@ -1,23 +1,23 @@
 "use strict";
 
 //构造函数，创建数据结构
-var CardContract = function() {
+var NasLinkContract = function() {
     //域名
     LocalContractStorage.defineMapProperty(this, "Card");
     LocalContractStorage.defineProperty(this, "CardCount");
     LocalContractStorage.defineMapProperty(this, "CardIndex");
 
-    //名字
+    //网站名字
     LocalContractStorage.defineMapProperty(this, "CardName");
     LocalContractStorage.defineProperty(this, "CardNameCount");
     LocalContractStorage.defineMapProperty(this, "CardNameIndex");
     LocalContractStorage.defineMapProperty(this, "CardNameCard");
 
-    //公司
-    LocalContractStorage.defineMapProperty(this, "CardCompany");
-    LocalContractStorage.defineProperty(this, "CardCompanyCount");
-    LocalContractStorage.defineMapProperty(this, "CardCompanyIndex");
-    LocalContractStorage.defineMapProperty(this, "CardCompanyCard");
+    //网站域名
+    LocalContractStorage.defineMapProperty(this, "CardDomain");
+    LocalContractStorage.defineProperty(this, "CardDomainCount");
+    LocalContractStorage.defineMapProperty(this, "CardDomainIndex");
+    LocalContractStorage.defineMapProperty(this, "CardDomainCard");
 
     //类型
     LocalContractStorage.defineMapProperty(this, "CardType");
@@ -34,17 +34,17 @@ var CardContract = function() {
 };
 
 //原型，存放智能合约方法
-CardContract.prototype = {
+NasLinkContract.prototype = {
     init: function() {
         this.CardCount = 0;
         this.CardNameCount = 0;
-        this.CardCompanyCount = 0;
+        this.CardDomainCount = 0;
         this.CardTypeCount = 0;
 
         this.admin = "n1G2qdFLkiT77AwjvAZQHg5Evh3o3kFyiUP";
     },
     /**
-     * 添加行业，返回行业索引
+     * 添加分类，返回分类索引
      * {name:"电子商务", cname: "eCommerce"}
      * return index
      */
@@ -58,7 +58,7 @@ CardContract.prototype = {
         }
 
         var cname = type.cname;
-        //根据别名获取行业信息
+        //根据别名获取分类信息
         var cardType = this.CardType.get(cname);
         if (!!cardType) {
             //如果是更新，则重新set carType
@@ -66,7 +66,7 @@ CardContract.prototype = {
                 cardType.name = type.name;
                 this.CardType.set(cname, cardType);
             } else {
-                throw new Error("行业已存在！");
+                throw new Error("分类已存在！");
             }
             return;
         }
@@ -83,7 +83,7 @@ CardContract.prototype = {
         return index;
     },
 
-    //获取所有的行业
+    //获取所有的分类
     allType: function() {
         var count = this.CardTypeCount;
         var result = {
@@ -122,8 +122,8 @@ CardContract.prototype = {
             }
             var hash = this.CardIndex.get(index);
             var card = this.Card.get(hash);
-            if(card.isRemove){
-                //如果当前数据被标记过删除，则将limit+1，保证返回的数据条数 === limit
+            if(card.isRemove || !card.isReview){
+                //如果当前数据被标记过删除或未审核，则将limit+1，保证返回的数据条数 === limit
                 limit++;
             }else{
                 card && result.cards.push(card);
@@ -135,7 +135,7 @@ CardContract.prototype = {
         return result;
     },
     /**
-     * 根据行业分页获取域名
+     * 根据分类分页获取域名
      * limit:限制每页返回的数量
      * offset:从第几页开始获取
      */
@@ -144,7 +144,7 @@ CardContract.prototype = {
         offset = parseInt(offset);
         var type = this.CardType.get(cname);
         if (!type) {
-            throw new Error("行业不存在！");
+            throw new Error("分类不存在！");
         }
         var cardCount = type.cardCount;
         if (offset > cardCount) {
@@ -164,7 +164,7 @@ CardContract.prototype = {
             }
             var hash = this.CardTypeCard.get(cname + "_" + index);
             var card = this.Card.get(hash);
-            if(card.isRemove){
+            if(card.isRemove || !card.isReview){
                 //如果当前数据被标记过删除，则将limit+1，保证返回的数据条数 === limit
                 limit++;
             }else{
@@ -230,22 +230,23 @@ CardContract.prototype = {
             //请输入5~1000个字
             throw new Error("请输入5~1000个字");
         }
-        //通过行业id获取行业名称
+        //通过分类id获取分类名称
         var type = this.CardType.get(detail.type);
         if (!type) {
-            throw new Error("行业不存在");
+            throw new Error("分类不存在");
         }
         var Card = {
             hash: hash,
             name: detail.name,
             email: detail.email,
-            company: detail.company,
-            job: detail.job,
+            ip: detail.ip,
+            domain: detail.domain,
             introduce: detail.introduce,
             phone: detail.phone,
             created: time,
             author: user,
             type: detail.type,
+            icon: detail.icon,
             index: this.CardCount
         };
 
@@ -255,7 +256,7 @@ CardContract.prototype = {
         this.CardIndex.set(this.CardCount, hash);
         this.CardCount += 1;
 
-        //将行业作为key存起来，供筛选使用
+        //将分类作为key存起来，供筛选使用
         var cname = type.cname;
         this.CardTypeCard.set(cname + "_" + type.cardCount, hash);
         type.cardCount += 1;
@@ -270,6 +271,23 @@ CardContract.prototype = {
             hash: hash
         };
         return result;
+    },
+    /**
+     * 审核域名，只有当前用户及admin才可审核
+     * hash:域名hash
+     */
+    reviewCard: function(hash){
+        var user = Blockchain.transaction.from;
+        var card = this.Card.get(hash);
+        if(card){
+            if(user !== this.admin){
+                throw new Error("无权操作！");
+            }
+            card.isReview = true;
+            this.Card.set(hash, card);
+        }else{
+            throw new Error("数据不存在！");
+        }
     },
     /**
      * 软删除域名，只有当前用户及admin才可删除
@@ -290,4 +308,4 @@ CardContract.prototype = {
     }
 };
 
-module.exports = CardContract;
+module.exports = NasLinkContract;
