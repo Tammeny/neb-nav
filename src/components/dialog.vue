@@ -3,7 +3,7 @@
         <mu-text-field label="站点名：" v-model="form.name"></mu-text-field>
         <mu-text-field label="手机：" v-model="form.phone"></mu-text-field>
         <mu-text-field label="邮箱：" v-model="form.email"></mu-text-field>
-         <mu-text-field label="图标：" v-model="form.icon"></mu-text-field>
+         <mu-text-field label="图标链接：" v-model="form.icon"></mu-text-field>
         <div class="select-control-group">
             域名：
             <mu-flex>

@@ -16,10 +16,11 @@
             <mu-row gutter>
                 <mu-col sm="6" md="6" lg="6" xl="3" v-for="(item, index) in cardList" :key="index">
                     <mu-card @click="showDetail(true, item)">
-                        <mu-card-title :title="item.name"></mu-card-title>
-                        <mu-card-text>
-                            {{item.introduce}}
-                        </mu-card-text>
+                        <mu-card-header :title="item.name" :sub-title="item.introduce">
+                            <mu-avatar slot="avatar">
+                                <img :src="item.icon">
+                            </mu-avatar>
+                        </mu-card-header>
                     </mu-card>
                 </mu-col>
             </mu-row>
@@ -78,8 +79,7 @@
         methods: {
             //域名详情
             showDetail(open, detail) {
-                console.info(open, detail);
-                location.href = detail.domain;
+                window.open(detail.domain);
             },
             //选择行业
             selectType(type, index) {
@@ -192,15 +192,12 @@
         top: 0;
     }
     
-    .mu-card-text {
-        padding-top: 0;
+    .mu-card-header-title .mu-card-sub-title {
+        font-size: 12px;
         overflow: hidden;
-        text-overflow: ellipsis;
         white-space: nowrap;
-    }
-    
-    .mu-card-title {
-        font-size: 18px;
+        text-overflow: ellipsis;
+        width: 180px;
     }
     
     .home .mu-card:hover {
