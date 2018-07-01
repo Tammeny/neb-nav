@@ -1,37 +1,28 @@
 <template>
     <div class="my">
-        <card-header></card-header>
-        <mu-container fluid class="container is-stripe">
+        <mu-linear-progress class="progress" size="5" color="secondary" v-if="isLoading"></mu-linear-progress>
+        <mu-container class="is-stripe">
             <mu-row gutter>
                 <mu-col sm="6" md="6" lg="6" xl="3" v-for="(item, index) in cardList" :key="index">
                     <mu-card>
-                        <mu-card-title :title="item.name" :sub-title="item.phone"></mu-card-title>
+                        <mu-card-title :title="item.name" :sub-title="item.domain"></mu-card-title>
                         <mu-card-text>
                             {{item.introduce}}
                         </mu-card-text>
                         <mu-button class="show-card" title="查看" icon @click="showDetail(true, item)" color="primary">
                             <mu-icon value="search"></mu-icon>
                         </mu-button>
-                        <mu-button 
-                            class="review-card" 
-                            :title="item.isReview ? '已审核': '待审核'" 
-                            icon 
-                            :color="item.isReview? 'primary': 'warning'">
+                        <mu-button class="review-card" :title="item.isReview ? '已审核': '待审核'" icon :color="item.isReview? 'primary': 'warning'">
                             <mu-icon value="done"></mu-icon>
                         </mu-button>
-                        <mu-button 
-                            class="delete-card" 
-                            :title="item.isRemove ? '已删除': '删除'" 
-                            icon 
-                            :disabled="item.isRemove" 
-                            color="error" 
-                            @click="removeCard(item.hash)">
+                        <mu-button class="delete-card" :title="item.isRemove ? '已删除': '删除'" icon :disabled="item.isRemove" color="error" @click="removeCard(item.hash)">
                             <mu-icon value="delete"></mu-icon>
                         </mu-button>
                     </mu-card>
                 </mu-col>
             </mu-row>
         </mu-container>
+        <card-sidebar></card-sidebar>
         <card-dialog></card-dialog>
         <card-detail></card-detail>
         <card-footer></card-footer>
@@ -39,7 +30,7 @@
 </template>
 
 <script>
-    import CardHeader from "../components/header.vue";
+    import CardSidebar from "../components/sidebar.vue";
     import CardFooter from "../components/footer.vue";
     import CardDialog from "../components/dialog.vue";
     import CardDetail from "../components/detail.vue";
@@ -61,13 +52,13 @@
             };
         },
         components: {
-            CardHeader,
+            CardSidebar,
             CardFooter,
             CardDialog,
             CardDetail
         },
         watch: {
-            isLoading: function(val){
+            isLoading: function(val) {
                 this.bus.$emit("showProgress", val);
             }
         },
@@ -76,11 +67,14 @@
         },
         methods: {
             //域名详情
-            showDetail(open, detail){
-                this.bus.$emit("openDetailDialog", {open:open, detail:detail});
+            showDetail(open, detail) {
+                this.bus.$emit("openDetailDialog", {
+                    open: open,
+                    detail: detail
+                });
             },
             //删除域名
-            removeCard: function(hash){
+            removeCard: function(hash) {
                 var _this = this;
                 var data = [hash];
                 console.info("准备要提交的数据是:", data);
@@ -138,16 +132,16 @@
                             if (!res) {
                                 return;
                             }
-                            if (res.result && res.result!=="null") {
+                            if (res.result && res.result !== "null") {
                                 var result = JSON.parse(res.result);
-                                if(offset === _this.pagination.offset){
+                                if (offset === _this.pagination.offset) {
                                     _this.cardList = result.cards;
-                                }else{
+                                } else {
                                     _this.cardList = _this.cardList.concat(
                                         result.cards
                                     );
                                 }
-
+    
                                 //判断有无下一页
                                 if (_this.cardList.length < result.total) {
                                     _this.pagination.show = true;
@@ -155,7 +149,7 @@
                                 } else {
                                     _this.pagination.show = false;
                                 }
-                            }else{
+                            } else {
                                 _this.bus.$emit('openSnackbar', {
                                     color: 'error',
                                     message: res.execute_err,
@@ -165,10 +159,10 @@
                                 });
                             }
                             _this.isLoading = false;
-                        }).catch(function(err){
+                        }).catch(function(err) {
                             _this.bus.$emit('openSnackbar', {
                                 color: 'error',
-                                message: "星云主网发生错误："+err+". 请刷新重试",
+                                message: "星云主网发生错误：" + err + ". 请刷新重试",
                                 open: true,
                                 timeout: 3000,
                                 position: 'top-end'
@@ -207,7 +201,7 @@
                                 });
                                 clearInterval(timer);
                                 location.reload();
-                            }else if (result.status === 0){
+                            } else if (result.status === 0) {
                                 clearInterval(timer);
                                 _this.bus.$emit('openSnackbar', {
                                     color: 'error',
@@ -225,25 +219,31 @@
 </script>
 
 <style>
-    body,.my{
+    body,
+    .my {
         min-height: 100vh;
     }
-    .my{
+    
+    .my {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
     }
+    
     .container {
         margin-top: 20px;
         flex-grow: 1;
     }
-    .container>.row>.col{
+    
+    .container>.row>.col {
         padding-top: 8px;
     }
-    .progress{
+    
+    .progress {
         position: absolute;
         top: 0;
     }
+    
     .mu-card-text {
         padding-top: 0;
     }
@@ -251,17 +251,20 @@
     .mu-card-title {
         font-size: 18px;
     }
-    .my .delete-card{
+    
+    .my .delete-card {
         position: absolute;
         top: 10px;
         right: 5px;
     }
-    .my .review-card{
+    
+    .my .review-card {
         position: absolute;
         top: 10px;
         right: 40px;
     }
-    .my .show-card{
+    
+    .my .show-card {
         position: absolute;
         top: 10px;
         right: 75px;

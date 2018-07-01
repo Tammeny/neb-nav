@@ -1,7 +1,12 @@
 <template>
     <div class="home">
-        <card-header></card-header>
-        <mu-container class="container is-stripe">
+        <mu-linear-progress class="progress" size="5" color="secondary" v-if="isLoading"></mu-linear-progress>
+        <mu-container class="is-stripe">
+            <mu-row>
+                <mu-alert color="warning" delete :show.sync="noWallet">
+                    安装<a target="_blank" href="https://github.com/ChengOrangeJu/WebExtensionWallet">星云钱包</a>使用本站所有功能！
+                </mu-alert>
+            </mu-row>
             <mu-row gutter>
                 <mu-col span="12" class="types">
                     <mu-button :textColor="ins==-1 ? 'grey50': 'grey900'" :color="ins == -1 ? 'primary': 'grey50'" @click="selectType(null, -1)">不限</mu-button>
@@ -19,6 +24,7 @@
                 </mu-col>
             </mu-row>
         </mu-container>
+        <card-sidebar></card-sidebar>
         <card-dialog></card-dialog>
         <card-detail></card-detail>
         <card-footer></card-footer>
@@ -26,7 +32,7 @@
 </template>
 
 <script>
-    import CardHeader from "../components/header.vue";
+    import CardSidebar from "../components/sidebar.vue";
     import CardFooter from "../components/footer.vue";
     import CardDialog from "../components/dialog.vue";
     import CardDetail from "../components/detail.vue";
@@ -41,13 +47,14 @@
                     offset: -1,
                     text: "加载更多"
                 },
+                noWallet: false,
                 ins: -1,
                 typeList: [],
                 isLoading: true
             };
         },
         components: {
-            CardHeader,
+            CardSidebar,
             CardFooter,
             CardDialog,
             CardDetail
@@ -63,6 +70,10 @@
                 _this.typeList = typeList;
             });
             _this.fetAllCard(_this.pagination.limit, _this.pagination.offset);
+    
+            if (typeof webExtensionWallet === "undefined") {
+                this.noWallet = true;
+            }
         },
         methods: {
             //域名详情
@@ -100,16 +111,16 @@
                         if (!res) {
                             return;
                         }
-                        if (res.result && res.result!=="null") {
+                        if (res.result && res.result !== "null") {
                             var result = JSON.parse(res.result);
-                            if(offset === _this.pagination.offset){
+                            if (offset === _this.pagination.offset) {
                                 _this.cardList = result.cards;
-                            }else{
+                            } else {
                                 _this.cardList = _this.cardList.concat(
                                     result.cards
                                 );
                             }
-
+    
                             //判断有无下一页
                             if (_this.cardList.length < result.total) {
                                 _this.pagination.show = true;
@@ -117,7 +128,7 @@
                             } else {
                                 _this.pagination.show = false;
                             }
-                        }else{
+                        } else {
                             _this.bus.$emit('openSnackbar', {
                                 color: 'error',
                                 message: res.execute_err,
@@ -127,10 +138,10 @@
                             });
                         }
                         _this.isLoading = false;
-                    }).catch(function(err){
+                    }).catch(function(err) {
                         _this.bus.$emit('openSnackbar', {
                             color: 'error',
-                            message: "星云主网发生错误："+err+". 请刷新重试",
+                            message: "星云主网发生错误：" + err + ". 请刷新重试",
                             open: true,
                             timeout: 3000,
                             position: 'top-end'

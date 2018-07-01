@@ -177,6 +177,13 @@ NasLinkContract.prototype = {
         return result;
     },
     /**
+     * 根据域名获取站点信息
+     */
+    getCardByDomain: function(domain) {
+        var domain = this.CardDomain.get(domain);
+        return domain;
+    },
+    /**
      * 根据当前用户分页获取域名
      * limit:限制每页返回的数量
      * offset:从第几页开始获取
@@ -226,6 +233,9 @@ NasLinkContract.prototype = {
             //电话号码不正确
             throw new Error("电话号码有误");
         }
+        if (!detail.domain){
+            throw new Error("请输入域名");
+        }
         if (detail.introduce < 5 || detail.introduce > 1000) {
             //请输入5~1000个字
             throw new Error("请输入5~1000个字");
@@ -261,6 +271,15 @@ NasLinkContract.prototype = {
         this.CardTypeCard.set(cname + "_" + type.cardCount, hash);
         type.cardCount += 1;
         this.CardType.set(cname, type);
+
+        //将域名作为key存起来，供筛选使用
+        var domain = this.CardDomain.get(detail.domain);
+        if(!domain){
+            //避免重复设置域名
+            this.CardDomain.set(detail.domain, detail);
+        }else{
+            throw new Error("此域名已提交过");
+        }
 
         //设置我的域名
         var myCardCount = this.MyCardCount.get(user) * 1;

@@ -1,7 +1,7 @@
 <template>
     <div class="admin">
-        <card-header></card-header>
-        <mu-container fluid class="container is-stripe">
+        <mu-linear-progress class="progress" size="5" color="secondary" v-if="isLoading"></mu-linear-progress>
+        <mu-container class="is-stripe">
             <h2>分类</h2>
             <mu-row gutter>
                 <mu-col sm="6" md="6" lg="6" xl="3" v-for="(item, index) in typeList" :key="index">
@@ -17,32 +17,20 @@
                 </mu-col>
             </mu-row>
             <h2>站点</h2>
-                        <mu-row gutter>
+            <mu-row gutter>
                 <mu-col sm="6" md="6" lg="6" xl="3" v-for="(item, index) in cardList" :key="index">
                     <mu-card>
-                        <mu-card-title :title="item.name" :sub-title="item.phone"></mu-card-title>
+                        <mu-card-title :title="item.name" :sub-title="item.domain"></mu-card-title>
                         <mu-card-text>
                             {{item.introduce}}
                         </mu-card-text>
                         <mu-button class="show-card" title="查看" icon @click="showDetail(true, item)" color="primary">
                             <mu-icon value="search"></mu-icon>
                         </mu-button>
-                        <mu-button 
-                            class="review-card" 
-                            :title="item.isReview ? '已审核': '审核'" 
-                            icon 
-                            :disabled="item.isReview" 
-                            color="primary" 
-                            @click="reviewCard(item.hash)">
+                        <mu-button class="review-card" :title="item.isReview ? '已审核': '审核'" icon :disabled="item.isReview" color="primary" @click="reviewCard(item.hash)">
                             <mu-icon value="done"></mu-icon>
                         </mu-button>
-                        <mu-button 
-                            class="delete-card" 
-                            :title="item.isRemove ? '已删除': '删除'" 
-                            icon 
-                            :disabled="item.isRemove" 
-                            color="error" 
-                            @click="removeCard(item.hash)">
+                        <mu-button class="delete-card" :title="item.isRemove ? '已删除': '删除'" icon :disabled="item.isRemove" color="error" @click="removeCard(item.hash)">
                             <mu-icon value="delete"></mu-icon>
                         </mu-button>
                     </mu-card>
@@ -55,13 +43,14 @@
                 <mu-button slot="actions" color="primary" @click="addType(form)">确定</mu-button>
             </mu-dialog>
         </mu-container>
+        <card-sidebar></card-sidebar>
         <card-dialog></card-dialog>
         <card-footer></card-footer>
     </div>
 </template>
 
 <script>
-    import CardHeader from "../components/header.vue";
+    import CardSidebar from "../components/sidebar.vue";
     import CardFooter from "../components/footer.vue";
     import CardDialog from "../components/dialog.vue";
     export default {
@@ -74,6 +63,7 @@
                     offset: -1,
                     text: "加载更多"
                 },
+                isLoading: true,
                 openAlert: false,
                 typeList: [],
                 cardList: [],
@@ -83,7 +73,7 @@
             };
         },
         components: {
-            CardHeader,
+            CardSidebar,
             CardFooter,
             CardDialog
         },
@@ -102,7 +92,7 @@
             closeAlertDialog() {
                 this.openAlert = false;
             },
-
+    
             //获取域名列表
             fetAllCard: function(limit, offset) {
                 var _this = this;
@@ -127,16 +117,16 @@
                             if (!res) {
                                 return;
                             }
-                            if (res.result && res.result!=="null") {
+                            if (res.result && res.result !== "null") {
                                 var result = JSON.parse(res.result);
-                                if(offset === _this.pagination.offset){
+                                if (offset === _this.pagination.offset) {
                                     _this.cardList = result.cards;
-                                }else{
+                                } else {
                                     _this.cardList = _this.cardList.concat(
                                         result.cards
                                     );
                                 }
-
+    
                                 //判断有无下一页
                                 if (_this.cardList.length < result.total) {
                                     _this.pagination.show = true;
@@ -144,7 +134,7 @@
                                 } else {
                                     _this.pagination.show = false;
                                 }
-                            }else{
+                            } else {
                                 _this.bus.$emit('openSnackbar', {
                                     color: 'error',
                                     message: res.execute_err,
@@ -154,10 +144,10 @@
                                 });
                             }
                             _this.isLoading = false;
-                        }).catch(function(err){
+                        }).catch(function(err) {
                             _this.bus.$emit('openSnackbar', {
                                 color: 'error',
-                                message: "星云主网发生错误："+err+". 请刷新重试",
+                                message: "星云主网发生错误：" + err + ". 请刷新重试",
                                 open: true,
                                 timeout: 3000,
                                 position: 'top-end'
@@ -176,7 +166,7 @@
                 );
             },
             //编辑分类
-            editType: function(type){
+            editType: function(type) {
                 this.form = type;
                 //标出是更新操作
                 this.form.update = true;
@@ -222,9 +212,9 @@
                     }
                 );
             },
-
+    
             //审核域名
-            reviewCard: function(hash){
+            reviewCard: function(hash) {
                 var _this = this;
                 var data = [hash];
                 console.info("准备要提交的数据是:", data);
@@ -259,7 +249,7 @@
                 );
             },
             //删除域名
-            removeCard: function(hash){
+            removeCard: function(hash) {
                 var _this = this;
                 var data = [hash];
                 console.info("准备要提交的数据是:", data);
@@ -314,7 +304,7 @@
                                 });
                                 clearInterval(timer);
                                 location.reload();
-                            }else if (result.status === 0){
+                            } else if (result.status === 0) {
                                 clearInterval(timer);
                                 _this.bus.$emit('openSnackbar', {
                                     color: 'error',
@@ -332,21 +322,26 @@
 </script>
 
 <style>
-    body,.admin{
+    body,
+    .admin {
         min-height: 100vh;
     }
-    .admin{
+    
+    .admin {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
     }
+    
     .container {
         flex-grow: 1;
     }
-    .progress{
+    
+    .progress {
         position: absolute;
         top: 0;
     }
+    
     .mu-card-text {
         padding-top: 0;
     }
@@ -355,10 +350,11 @@
         font-size: 18px;
     }
     
-    .container>.row>.col{
+    .container>.row>.col {
         padding-top: 8px;
     }
-    .admin .edit-type{
+    
+    .admin .edit-type {
         position: absolute;
         right: 0;
         bottom: 2px;

@@ -1,7 +1,6 @@
 <template>
     <div class="help">
-        <card-header></card-header>
-        <mu-container>
+        <mu-container class="is-stripe">
             <mu-row>
                 <mu-col span="12">
                     <h1>聚名片使用教程</h1>
@@ -18,13 +17,14 @@
                 </mu-col>
             </mu-row>
         </mu-container>
+        <card-sidebar></card-sidebar>
         <card-dialog></card-dialog>
         <card-footer></card-footer>
     </div>
 </template>
 
 <script>
-    import CardHeader from "../components/header.vue";
+    import CardSidebar from "../components/sidebar.vue";
     import CardFooter from "../components/footer.vue";
     import CardDialog from "../components/dialog.vue";
     export default {
@@ -32,7 +32,7 @@
             return {};
         },
         components: {
-            CardHeader,
+            CardSidebar,
             CardFooter,
             CardDialog
         },

@@ -1,10 +1,11 @@
 <template>
-    <mu-dialog scrollable ref="dialog" title="发布站点" width="600" max-width="80%" :esc-press-close="false" :overlay-close="false" :open.sync="openAlert">
-        <mu-text-field label="站点名" v-model="form.name"></mu-text-field>
-        <mu-text-field label="手机" v-model="form.phone"></mu-text-field>
-        <mu-text-field label="邮箱" v-model="form.email"></mu-text-field>
-         <mu-text-field label="图标" v-model="form.icon"></mu-text-field>
+    <mu-dialog scrollable ref="dialog" title="发布站点（提交后，请耐心等待管理员审核。）" width="600" max-width="80%" :esc-press-close="false" :overlay-close="false" :open.sync="openAlert">
+        <mu-text-field label="站点名：" v-model="form.name"></mu-text-field>
+        <mu-text-field label="手机：" v-model="form.phone"></mu-text-field>
+        <mu-text-field label="邮箱：" v-model="form.email"></mu-text-field>
+         <mu-text-field label="图标：" v-model="form.icon"></mu-text-field>
         <div class="select-control-group">
+            域名：
             <mu-flex>
                 <mu-radio v-model="form.subDomain" :value="false" label="用自己的域名"></mu-radio>
                 <mu-radio v-model="form.subDomain" :value="true" label="使用nas.link二级域名"></mu-radio>
@@ -17,12 +18,12 @@
             </mu-flex>
         </div>
     
-        <mu-select label="分类" v-model="form.type">
+        <mu-select label="分类：" v-model="form.type">
             <mu-option v-for="(item,index) in typeList" :key="index" :label="item.name" :value="item.cname"></mu-option>
         </mu-select>
-        <mu-text-field label="介绍" v-model="form.introduce" placeholder="请认真填写DAPP介绍" multi-line :rows="3" :rows-max="6" full-width></mu-text-field>
+        <mu-text-field label="介绍：" v-model="form.introduce" placeholder="请认真填写DAPP介绍" multi-line :rows="3" :rows-max="6" full-width></mu-text-field>
         <mu-button slot="actions" flat @click="closeAlertDialog">取消</mu-button>
-        <mu-button slot="actions" color="primary" @click="addCard(form)">发布</mu-button>
+        <mu-button slot="actions" color="primary" @click="addCard(form)">提交</mu-button>
     </mu-dialog>
 </template>
 
@@ -99,12 +100,16 @@
             },
             addCard: function(form) {
                 var _this = this;
+                var domain = form.subDomain ? form.domain+".nas.link":form.domain;
+                if(domain.indexOf("http") === -1){
+                    domain = "http://" + domain;
+                }
                 var data = [{
                     name: form.name,
                     phone: form.phone,
                     email: form.email,
                     ip: form.ip,
-                    domain: form.subDomain ? form.domain+".nas.link":form.domain,
+                    domain: domain,
                     icon: form.icon,
                     type: form.type,
                     introduce: form.introduce,
