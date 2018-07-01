@@ -1,17 +1,30 @@
 <template>
     <div class="admin">
         <mu-linear-progress class="progress" size="5" color="secondary" v-if="isLoading"></mu-linear-progress>
+        <mu-breadcrumbs>
+            <mu-breadcrumbs-item to="/">首页</mu-breadcrumbs-item>
+            <mu-breadcrumbs-item disabled>管理</mu-breadcrumbs-item>
+        </mu-breadcrumbs>
         <mu-container class="is-stripe">
             <h2>分类</h2>
             <mu-row gutter>
+                <mu-col sm="6" md="6" lg="6" xl="3">
+                    <mu-tooltip content="添加分类" placement="right">
+                        <mu-button middle fab color="gray" @click="openAlertDialog">
+                            <mu-icon value="playlist_add"></mu-icon>
+                        </mu-button>
+                    </mu-tooltip>
+                </mu-col>
                 <mu-col sm="6" md="6" lg="6" xl="3" v-for="(item, index) in typeList" :key="index">
                     <mu-card>
                         <mu-card-title :title="item.name"></mu-card-title>
                         <mu-card-actions>
                             <mu-button flat>站点数: {{item.cardCount}}</mu-button>
-                            <mu-button class="edit-type" icon color="primary" @click="editType(item)">
-                                <mu-icon value="edit"></mu-icon>
-                            </mu-button>
+                            <mu-tooltip content="编辑分类" placement="top">
+                                <mu-button class="edit-type" icon color="primary" @click="editType(item)">
+                                    <mu-icon value="edit"></mu-icon>
+                                </mu-button>
+                            </mu-tooltip>
                         </mu-card-actions>
                     </mu-card>
                 </mu-col>
@@ -24,19 +37,25 @@
                         <mu-card-text>
                             {{item.introduce}}
                         </mu-card-text>
-                        <mu-button class="show-card" title="查看" icon @click="showDetail(true, item)" color="primary">
-                            <mu-icon value="search"></mu-icon>
-                        </mu-button>
-                        <mu-button class="review-card" :title="item.isReview ? '已审核': '审核'" icon :disabled="item.isReview" color="primary" @click="reviewCard(item.hash)">
-                            <mu-icon value="done"></mu-icon>
-                        </mu-button>
-                        <mu-button class="delete-card" :title="item.isRemove ? '已删除': '删除'" icon :disabled="item.isRemove" color="error" @click="removeCard(item.hash)">
-                            <mu-icon value="delete"></mu-icon>
-                        </mu-button>
+                        <mu-tooltip content="查看详情" placement="top">
+                            <mu-button class="show-card" icon @click="showDetail(true, item)" color="primary">
+                                <mu-icon value="search"></mu-icon>
+                            </mu-button>
+                        </mu-tooltip>
+                        <mu-tooltip :content="item.isReview ? '已审核': '审核'" placement="top">
+                            <mu-button class="review-card" icon :disabled="item.isReview" color="primary" @click="reviewCard(item.hash)">
+                                <mu-icon value="done"></mu-icon>
+                            </mu-button>
+                        </mu-tooltip>
+                        <mu-tooltip :content="item.isRemove ? '已删除': '删除'" placement="top">
+                            <mu-button class="delete-card" icon :disabled="item.isRemove" color="error" @click="removeCard(item.hash)">
+                                <mu-icon value="delete"></mu-icon>
+                            </mu-button>
+                        </mu-tooltip>
                     </mu-card>
                 </mu-col>
             </mu-row>
-            <mu-dialog title="编辑分类" width="600" max-width="80%" :esc-press-close="false" :overlay-close="false" :open.sync="openAlert">
+            <mu-dialog :title="`${form.update?'编辑':'添加'}分类`" width="600" max-width="80%" :esc-press-close="false" :overlay-close="false" :open.sync="openAlert">
                 <mu-text-field full-width label="分类名称" v-model="form.name"></mu-text-field>
                 <mu-text-field full-width label="分类别名" v-model="form.cname"></mu-text-field>
                 <mu-button slot="actions" flat @click="closeAlertDialog">取消</mu-button>
@@ -44,15 +63,15 @@
             </mu-dialog>
         </mu-container>
         <card-sidebar></card-sidebar>
-        <card-dialog></card-dialog>
+        <card-detail></card-detail>
         <card-footer></card-footer>
     </div>
 </template>
 
 <script>
     import CardSidebar from "../components/sidebar.vue";
+    import CardDetail from "../components/detail.vue";
     import CardFooter from "../components/footer.vue";
-    import CardDialog from "../components/dialog.vue";
     export default {
         data() {
             return {
@@ -68,31 +87,72 @@
                 typeList: [],
                 cardList: [],
                 form: {
-                    name: ""
+                    name: "",
+                    update: false
                 }
             };
         },
         components: {
             CardSidebar,
-            CardFooter,
-            CardDialog
+            CardDetail,
+            CardFooter
         },
         created: function() {
             var _this = this;
-            this.bus.$on('typeList', function(typeList) {
-                _this.typeList = typeList;
-                _this.bus.$emit("showProgress", false);
-            });
-            this.bus.$on('openTypeDialog', function(bool) {
-                _this.openAlert = bool;
-            });
             this.fetAllCard(this.pagination.limit, this.pagination.offset);
+            this.fetchAllType();
         },
         methods: {
+            openAlertDialog() {
+                this.openAlert = true;
+            },
             closeAlertDialog() {
                 this.openAlert = false;
             },
-    
+            //获取所有分类
+            fetchAllType: function() {
+                var _this = this;
+                nebApi
+                    .call({
+                        chainID: config.nebState.chain_id,
+                        from: config.contractAddress,
+                        to: config.contractAddress,
+                        value: 0,
+                        // nonce: nonce,
+                        gasPrice: 1000000,
+                        gasLimit: 2000000,
+                        contract: {
+                            function: "allType"
+                        }
+                    })
+                    .then(function(res) {
+                        console.info(res);
+                        if (!res) {
+                            return;
+                        }
+                        if (res.result && res.result !== "null") {
+                            var result = JSON.parse(res.result);
+                            _this.typeList = result.types;
+                        } else {
+                            _this.bus.$emit('openSnackbar', {
+                                color: 'error',
+                                message: res.execute_err,
+                                open: true,
+                                timeout: 3000,
+                                position: 'top-end'
+                            });
+                        }
+                        _this.isLoading = false;
+                    }).catch(function(err) {
+                        _this.bus.$emit('openSnackbar', {
+                            color: 'error',
+                            message: "星云主网发生错误：" + err + ". 请刷新重试",
+                            open: true,
+                            timeout: 3000,
+                            position: 'top-end'
+                        });
+                    });
+            },
             //获取域名列表
             fetAllCard: function(limit, offset) {
                 var _this = this;
@@ -155,6 +215,13 @@
                         });
                 });
             },
+            //域名详情
+            showDetail(open, detail) {
+                this.bus.$emit("openDetailDialog", {
+                    open: open,
+                    detail: detail
+                });
+            },
             //加载更多
             loadMore: function() {
                 var _this = this;
@@ -170,7 +237,7 @@
                 this.form = type;
                 //标出是更新操作
                 this.form.update = true;
-                this.bus.$emit('openTypeDialog', true);
+                this.openAlertDialog();
             },
             //添加分类
             addType: function(form) {

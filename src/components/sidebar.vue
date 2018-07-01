@@ -14,25 +14,19 @@
                     </mu-list-item-action>
                     <mu-list-item-title>星云导航</mu-list-item-title>
                 </mu-list-item><br><br>
-                <mu-list-item button @click="openAlertDialog">
+                <mu-list-item button to="/submit">
                     <mu-list-item-action>
                         <mu-icon value="send"></mu-icon>
                     </mu-list-item-action>
-                    <mu-list-item-title>免费提交</mu-list-item-title>
+                    <mu-list-item-title>提交站点</mu-list-item-title>
                 </mu-list-item>
-                <mu-list-item button to="/my" :class="{hover: $route.name === 'my'}">
+                <mu-list-item button to="/my">
                     <mu-list-item-action>
                         <mu-icon value="person"></mu-icon>
                     </mu-list-item-action>
                     <mu-list-item-title>我的站点</mu-list-item-title>
                 </mu-list-item>
-                <mu-list-item button @click="openTypeDialog" v-if="$route.name === 'admin'">
-                    <mu-list-item-action>
-                        <mu-icon value="view_column"></mu-icon>
-                    </mu-list-item-action>
-                    <mu-list-item-title>添加分类</mu-list-item-title>
-                </mu-list-item>
-                <mu-list-item v-if="isAdmin" button to="/admin" :class="{hover: $route.name === 'admin'}">
+                <mu-list-item v-if="isAdmin" button to="/admin">
                     <mu-list-item-action>
                         <mu-icon value="settings"></mu-icon>
                     </mu-list-item-action>
@@ -72,12 +66,6 @@
         methods: {
             openSidebar(){
                 this.drawer.open = true;
-            },
-            openAlertDialog() {
-                this.bus.$emit('openAlertDialog', true);
-            },
-            openTypeDialog() {
-                this.bus.$emit('openTypeDialog', true);
             }
         }
     }

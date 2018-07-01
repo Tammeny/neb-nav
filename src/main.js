@@ -8,6 +8,7 @@ Vue.use(MuseUI);
 
 import CardSnackbar from "./components/snackbar.vue";
 import Home from "./page/home.vue";
+import Submit from "./page/submit.vue";
 import My from "./page/my.vue";
 import Help from "./page/help.vue";
 import Admin from "./page/admin.vue";
@@ -16,6 +17,7 @@ Vue.use(VueRouter);
 
 const routes = [
     { path: "/", component: Home, name: "home", meta: { name: "首页" } },
+    { path: "/submit", component: Submit, name: "submit", meta: { name: "免费提交" } },
     { path: "/my/", component: My, name: "my", meta: { name: "我的名片" } },
     { path: "/help", component: Help, name: "help", meta: { name: "帮助" } },
     { path: "/admin", component: Admin, name: "admin", meta: { name: "管理" } }

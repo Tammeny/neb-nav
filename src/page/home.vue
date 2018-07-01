@@ -16,18 +16,18 @@
             <mu-row gutter>
                 <mu-col sm="6" md="6" lg="6" xl="3" v-for="(item, index) in cardList" :key="index">
                     <mu-card @click="showDetail(true, item)">
+                        <mu-tooltip :content="item.introduce">
                         <mu-card-header :title="item.name" :sub-title="item.introduce">
                             <mu-avatar slot="avatar">
                                 <img :src="item.icon">
                             </mu-avatar>
                         </mu-card-header>
+                        </mu-tooltip>
                     </mu-card>
                 </mu-col>
             </mu-row>
         </mu-container>
         <card-sidebar></card-sidebar>
-        <card-dialog></card-dialog>
-        <card-detail></card-detail>
         <card-footer></card-footer>
     </div>
 </template>
@@ -35,8 +35,6 @@
 <script>
     import CardSidebar from "../components/sidebar.vue";
     import CardFooter from "../components/footer.vue";
-    import CardDialog from "../components/dialog.vue";
-    import CardDetail from "../components/detail.vue";
     export default {
         data() {
             return {
@@ -56,9 +54,7 @@
         },
         components: {
             CardSidebar,
-            CardFooter,
-            CardDialog,
-            CardDetail
+            CardFooter
         },
         watch: {
             isLoading: function(val) {
@@ -71,7 +67,7 @@
                 _this.typeList = typeList;
             });
             _this.fetAllCard(_this.pagination.limit, _this.pagination.offset);
-    
+            _this.fetchAllType();
             if (typeof webExtensionWallet === "undefined") {
                 this.noWallet = true;
             }
@@ -87,6 +83,50 @@
                 _this.ins = index;
                 _this.cardList = [];
                 _this.fetAllCard(_this.pagination.limit, _this.pagination.offset, type)
+            },
+            //获取所有分类
+            fetchAllType: function() {
+                var _this = this;
+                nebApi
+                    .call({
+                        chainID: config.nebState.chain_id,
+                        from: config.contractAddress,
+                        to: config.contractAddress,
+                        value: 0,
+                        // nonce: nonce,
+                        gasPrice: 1000000,
+                        gasLimit: 2000000,
+                        contract: {
+                            function: "allType"
+                        }
+                    })
+                    .then(function(res) {
+                        console.info(res);
+                        if (!res) {
+                            return;
+                        }
+                        if (res.result && res.result !== "null") {
+                            var result = JSON.parse(res.result);
+                            _this.typeList = result.types;
+                        } else {
+                            _this.bus.$emit('openSnackbar', {
+                                color: 'error',
+                                message: res.execute_err,
+                                open: true,
+                                timeout: 3000,
+                                position: 'top-end'
+                            });
+                        }
+                        _this.isLoading = false;
+                    }).catch(function(err) {
+                        _this.bus.$emit('openSnackbar', {
+                            color: 'error',
+                            message: "星云主网发生错误：" + err + ". 请刷新重试",
+                            open: true,
+                            timeout: 3000,
+                            position: 'top-end'
+                        });
+                    });
             },
             //获取域名列表
             fetAllCard: function(limit, offset, cname) {

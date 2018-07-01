@@ -1,6 +1,10 @@
 <template>
     <div class="my">
         <mu-linear-progress class="progress" size="5" color="secondary" v-if="isLoading"></mu-linear-progress>
+        <mu-breadcrumbs>
+            <mu-breadcrumbs-item to="/">首页</mu-breadcrumbs-item>
+            <mu-breadcrumbs-item disabled>我的站点</mu-breadcrumbs-item>
+        </mu-breadcrumbs>
         <mu-container class="is-stripe">
             <mu-row gutter>
                 <mu-col sm="6" md="6" lg="6" xl="3" v-for="(item, index) in cardList" :key="index">
@@ -9,15 +13,21 @@
                         <mu-card-text>
                             {{item.introduce}}
                         </mu-card-text>
+                        <mu-tooltip content="查看详情" placement="top">
                         <mu-button class="show-card" title="查看" icon @click="showDetail(true, item)" color="primary">
                             <mu-icon value="search"></mu-icon>
                         </mu-button>
-                        <mu-button class="review-card" :title="item.isReview ? '已审核': '待审核'" icon :color="item.isReview? 'primary': 'warning'">
+                        </mu-tooltip>
+                        <mu-tooltip :content="item.isReview ? '已审核': '待审核'" placement="top">
+                        <mu-button class="review-card" icon :color="item.isReview? 'primary': 'warning'">
                             <mu-icon value="done"></mu-icon>
                         </mu-button>
-                        <mu-button class="delete-card" :title="item.isRemove ? '已删除': '删除'" icon :disabled="item.isRemove" color="error" @click="removeCard(item.hash)">
+                        </mu-tooltip>
+                        <mu-tooltip :content="item.isRemove ? '已删除': '删除'" placement="top">
+                        <mu-button class="delete-card" icon :disabled="item.isRemove" color="error" @click="removeCard(item.hash)">
                             <mu-icon value="delete"></mu-icon>
                         </mu-button>
+                        </mu-tooltip>
                     </mu-card>
                 </mu-col>
             </mu-row>
@@ -250,23 +260,5 @@
     
     .mu-card-title {
         font-size: 18px;
-    }
-    
-    .my .delete-card {
-        position: absolute;
-        top: 10px;
-        right: 5px;
-    }
-    
-    .my .review-card {
-        position: absolute;
-        top: 10px;
-        right: 40px;
-    }
-    
-    .my .show-card {
-        position: absolute;
-        top: 10px;
-        right: 75px;
     }
 </style>
