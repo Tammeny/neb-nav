@@ -14,8 +14,8 @@
                     <mu-text-field label="图标链接：" v-model="form.icon"></mu-text-field>
                     <div class="select-control-group">
                         <mu-flex>
-                            <mu-radio v-model="form.subDomain" :value="false" label="用自己的域名"></mu-radio>
-                            <mu-radio v-model="form.subDomain" :value="true" label="使用nas.link二级域名"></mu-radio>
+                            <mu-radio v-model="form.subDomain" :value="false" label="使用自己的域名"></mu-radio>
+                            <mu-radio v-model="form.subDomain" :value="true" label="开通nas.link二级域名"></mu-radio>
                         </mu-flex>
                         <mu-flex>
                             <mu-text-field label="域名：" v-model="form.domain" :suffix="form.subDomain ? '.nas.link':''"></mu-text-field>

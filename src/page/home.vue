@@ -4,7 +4,7 @@
         <mu-container class="is-stripe">
             <mu-row>
                 <mu-alert color="success" v-if="openNotice" delete @delete="closeNoticeAlert()">
-                    nas.link二级域名限时免费申请，提交站点时选择“使用nas.link二级域名”即可开通。
+                    nas.link二级域名限时免费申请，提交站点时选择“开通nas.link二级域名”即可。
                 </mu-alert>
             </mu-row>
             <mu-row>
