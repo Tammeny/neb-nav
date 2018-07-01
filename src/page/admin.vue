@@ -99,8 +99,8 @@
         },
         created: function() {
             var _this = this;
-            this.fetAllCard(this.pagination.limit, this.pagination.offset);
-            this.fetchAllType();
+            _this.fetAllCard(_this.pagination.limit, _this.pagination.offset);
+            _this.fetchAllType();
         },
         methods: {
             openAlertDialog() {
@@ -112,6 +112,7 @@
             //获取所有分类
             fetchAllType: function() {
                 var _this = this;
+                _this.isLoading = true;
                 nebApi
                     .call({
                         chainID: config.nebState.chain_id,
@@ -157,6 +158,7 @@
             fetAllCard: function(limit, offset) {
                 var _this = this;
                 console.info(limit, offset);
+                _this.isLoading = true;
                 nebApi.getNebState().then(function(state) {
                     nebApi
                         .call({
@@ -273,7 +275,7 @@
                                 timeout: 60000,
                                 position: 'top-end'
                             });
-                            _this.bus.$emit('openTypeDialog', false);
+                            _this.closeAlertDialog();
                             _this.checkTransaction(value.txhash);
                         }
                     }
@@ -370,7 +372,8 @@
                                     position: 'top-end'
                                 });
                                 clearInterval(timer);
-                                location.reload();
+                                _this.fetAllCard(_this.pagination.limit, _this.pagination.offset);
+                                _this.fetchAllType();
                             } else if (result.status === 0) {
                                 clearInterval(timer);
                                 _this.bus.$emit('openSnackbar', {

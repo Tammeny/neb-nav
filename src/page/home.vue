@@ -3,6 +3,11 @@
         <mu-linear-progress class="progress" size="5" color="secondary" v-if="isLoading"></mu-linear-progress>
         <mu-container class="is-stripe">
             <mu-row>
+                <mu-alert color="success" v-if="openNotice" delete @delete="closeNoticeAlert()">
+                    nas.link二级域名限时免费申请，提交站点时选择“使用nas.link二级域名”即可开通。
+                </mu-alert>
+            </mu-row>
+            <mu-row>
                 <mu-alert color="warning" delete :show.sync="noWallet">
                     安装<a target="_blank" href="https://github.com/ChengOrangeJu/WebExtensionWallet">星云钱包</a>使用本站所有功能！
                 </mu-alert>
@@ -49,7 +54,8 @@
                 noWallet: false,
                 ins: -1,
                 typeList: [],
-                isLoading: true
+                isLoading: true,
+                openNotice: true
             };
         },
         components: {
@@ -73,6 +79,9 @@
             }
         },
         methods: {
+            closeNoticeAlert(){
+                this.openNotice = false;
+            },
             //域名详情
             showDetail(open, detail) {
                 window.open(detail.domain);
